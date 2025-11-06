@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "nextps.panel-ufo.fr",
         port: "",
-        pathname: "/api/images/**",
+        pathname: "/img/**",
       },
     ],
   },
