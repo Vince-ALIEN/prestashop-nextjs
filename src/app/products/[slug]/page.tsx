@@ -41,18 +41,22 @@ export default async function ProductPage(props: PageProps) {
         <div className="container mx-auto px-4 py-8">
           {/* Breadcrumb */}
           <nav className="text-sm text-gray-600 mb-6 flex items-center gap-2">
-            <Link href="/" className="hover:text-blue-600">Accueil</Link>
+            <Link href="/" className="hover:text-blue-600">
+              Accueil
+            </Link>
             <span>/</span>
-            <Link href="/products" className="hover:text-blue-600">Produits</Link>
+            <Link href="/products" className="hover:text-blue-600">
+              Produits
+            </Link>
             <span>/</span>
             <span className="text-gray-900 font-medium">{name}</span>
           </nav>
 
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 p-8">
               {/* Images */}
-              <div className="space-y-4">
-                <div className="relative h-96 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
+              <div className="lg:col-span-2 col-span-3 space-y-4">
+                <div className="relative lg:h-200 h-80 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
                   {mainImage ? (
                     <ProductImage
                       productId={product.id}
@@ -69,17 +73,17 @@ export default async function ProductPage(props: PageProps) {
                 </div>
 
                 {images.length > 1 && (
-                  <div className="grid grid-cols-5 gap-2">
+                  <div className="grid grid-cols-6 gap-2">
                     {images.slice(0, 5).map((img) => (
                       <div
                         key={img.id}
-                        className="relative h-20 rounded-lg overflow-hidden bg-gray-100 border-2 border-gray-200 hover:border-blue-600 cursor-pointer transition-all"
+                        className="relative lg:h-50 h-20 rounded-lg overflow-hidden bg-gray-100 border-2 border-gray-200 hover:border-blue-600 cursor-pointer transition-all"
                       >
                         <ProductImage
                           productId={product.id}
                           imageId={img.id}
                           alt={name}
-                          size="small_default"
+                          size="medium_default"
                         />
                       </div>
                     ))}
@@ -88,38 +92,45 @@ export default async function ProductPage(props: PageProps) {
               </div>
 
               {/* Product Info */}
-              <div className="space-y-6">
+              <div className="lg:col-span-1 col-span-3  space-y-6">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{name}</h1>
-                  {product.reference && (
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                    {name}
+                  </h1>
+                  {product.reference && !hasVariants && (
                     <p className="text-sm text-gray-500 flex items-center gap-2">
                       <Package className="w-4 h-4" />
-                      Référence: <span className="font-medium">{product.reference}</span>
+                      Référence:{" "}
+                      <span className="font-medium">{product.reference}</span>
                     </p>
                   )}
                 </div>
-
-                {descriptionShort && (
-                  <div
-                    className="text-gray-700 leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: descriptionShort }}
-                  />
-                )}
 
                 {hasVariants ? (
                   <ProductOptionsWrapper
                     groups={attributeGroups}
                     combinations={combinations.map((c) =>
-                      c.toFormattedCombination(product.getPrice())
+                      c.toFormattedCombination(product.getPrice()),
                     )}
                     basePrice={price}
                     isProductActive={isAvailable}
                     productId={product.id}
                     productName={name}
+                    descriptionShort={descriptionShort}
                   />
                 ) : (
                   <div>
-                    <span className="text-3xl font-bold text-blue-600">{price}</span>
+                    <span className="text-3xl font-bold text-blue-600">
+                      {price}
+                    </span>
+
+                    {descriptionShort && (
+                      <div
+                        className="mt-4 text-gray-700 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: descriptionShort }}
+                      />
+                    )}
+
                     <div className="mt-4">
                       {isAvailable ? (
                         <button className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
@@ -138,13 +149,17 @@ export default async function ProductPage(props: PageProps) {
                   {product.ean13 && (
                     <div className="flex items-center gap-2">
                       <span className="text-gray-600">EAN13:</span>
-                      <span className="text-gray-800 font-medium">{product.ean13}</span>
+                      <span className="text-gray-800 font-medium">
+                        {product.ean13}
+                      </span>
                     </div>
                   )}
                   {product.hasWeight() && (
                     <div className="flex items-center gap-2">
                       <Weight className="w-4 h-4 text-gray-600" />
-                      <span className="text-gray-800">{product.getWeight()} kg</span>
+                      <span className="text-gray-800">
+                        {product.getWeight()} kg
+                      </span>
                     </div>
                   )}
                 </div>

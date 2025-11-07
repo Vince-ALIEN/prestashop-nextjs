@@ -81,7 +81,7 @@ export function getManufacturerImageUrl(
   manufacturerId: string | number,
   size: ImageSize = 'medium_default'
 ): string {
-  // Option 1 : URL directe PrestaShop
+  // Option 1 : URL directe de PrestaShop
   const baseUrl = process.env.NEXT_PUBLIC_PRESTASHOP_URL;
 
   // Option 2 : CDN (ex: Cloudflare, Cloudinary)

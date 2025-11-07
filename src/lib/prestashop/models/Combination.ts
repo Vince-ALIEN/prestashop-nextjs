@@ -20,13 +20,15 @@ export default class Combination extends Model {
   price: number;
   associations?: CombinationData["associations"];
   private product?: Product;
+  private stockQuantity?: number; // Stock injecté depuis Product.getCombinations()
 
   constructor(data: CombinationData, product?: Product) {
     super();
     this.id = parseInt(data.id.toString());
     this.id_product = parseInt(data.id_product.toString());
     this.reference = data.reference;
-    this.price = typeof data.price === "string" ? parseFloat(data.price) : (data.price || 0);
+    this.price =
+      typeof data.price === "string" ? parseFloat(data.price) : data.price || 0;
     this.associations = data.associations;
     this.product = product;
   }
@@ -41,21 +43,29 @@ export default class Combination extends Model {
   }
 
   getStock(): number {
+    // Priorité 1 : Stock injecté directement (depuis l'API stock_availables)
+    if (this.stockQuantity !== undefined) {
+      return this.stockQuantity;
+    }
+
+    // Priorité 2 : Stock dans les associations du produit (fallback)
     if (this.product?.associations?.stock_availables) {
       const stock = this.product.associations.stock_availables.find(
-        (s) => parseInt(s.id_product_attribute.toString()) === this.id
+        (s) => parseInt(s.id_product_attribute.toString()) === this.id,
       );
       if (stock) {
         return parseInt(stock.quantity?.toString() || "0");
       }
     }
+
+    // Par défaut : pas de stock
     return 0;
   }
 
   getAttributeIds(): number[] {
     if (!this.associations?.product_option_values) return [];
     return this.associations.product_option_values.map((attr) =>
-      parseInt(attr.id.toString())
+      parseInt(attr.id.toString()),
     );
   }
 

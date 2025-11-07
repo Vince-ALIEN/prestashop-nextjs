@@ -20,10 +20,10 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
               <User className="w-5 h-5" />
             </button>
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors relative">
+            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors relative cursor-pointer">
               <ShoppingCart className="w-5 h-5" />
               <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
                 0

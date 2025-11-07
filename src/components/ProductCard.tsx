@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ProductImage from "./ProductImage";
+import { MoveRight } from "lucide-react";
 
 interface ProductCardProps {
   id: number;
@@ -23,7 +24,7 @@ export default function ProductCard({
       href={`/products/${link_rewrite}`}
       className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
     >
-      <div className="relative h-64 bg-gray-100">
+      <div className="relative h-94 bg-gray-100">
         <ProductImage
           productId={id}
           imageId={imageId}
@@ -47,8 +48,9 @@ export default function ProductCard({
         
         <div className="flex items-center justify-between">
           <span className="text-xl font-bold text-blue-600">{price}</span>
-          <span className="text-sm text-blue-600 group-hover:underline">
-            Voir détails →
+          <span className="inline-flex items-center gap-2 text-sm text-blue-600 group-hover:underline">
+            Voir détails
+            <MoveRight className="w-4 h-4" />
           </span>
         </div>
       </div>

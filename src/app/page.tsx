@@ -1,7 +1,7 @@
 import { Product } from "@/lib/prestashop/models";
 import ProductCard from "@/components/ProductCard";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { MoveRight } from "lucide-react";
 
 export default async function HomePage() {
   const products = await Product.getActive(8);
@@ -9,7 +9,7 @@ export default async function HomePage() {
   return (
     <main className="flex-1 bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+      <section className="bg-linear-to-r from-blue-600 to-blue-800 text-white">
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-5xl font-bold mb-6">
             Bienvenue sur notre boutique
@@ -22,7 +22,7 @@ export default async function HomePage() {
             className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
           >
             Voir tous les produits
-            <ArrowRight className="w-5 h-5" />
+            <MoveRight className="w-5 h-5" />
           </Link>
         </div>
       </section>
@@ -38,7 +38,7 @@ export default async function HomePage() {
             className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-2"
           >
             Voir tout
-            <ArrowRight className="w-4 h-4" />
+            <MoveRight className="w-4 h-4" />
           </Link>
         </div>
 
