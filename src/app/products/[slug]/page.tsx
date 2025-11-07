@@ -1,5 +1,6 @@
 import { Product, Configuration } from "@/lib/prestashop/models";
 import Combination from "@/lib/prestashop/models/Combination";
+import Breadcrumb from "@/components/Breadcrumb";
 import ProductImage from "@/components/ProductImage";
 import ProductOptionsWrapper from "@/components/ProductOptionsWrapper";
 import Link from "next/link";
@@ -17,6 +18,7 @@ export default async function ProductPage(props: PageProps) {
 
     if (!product) notFound();
 
+    const category = await product.getCategory();
     const name = product.getName();
     const description = product.getDescription();
     const descriptionShort = product.getDescriptionShort();
@@ -40,17 +42,10 @@ export default async function ProductPage(props: PageProps) {
       <main className="flex-1 bg-gray-50">
         <div className="container mx-auto px-4 py-8">
           {/* Breadcrumb */}
-          <nav className="text-sm text-gray-600 mb-6 flex items-center gap-2">
-            <Link href="/" className="hover:text-blue-600">
-              Accueil
-            </Link>
-            <span>/</span>
-            <Link href="/products" className="hover:text-blue-600">
-              Produits
-            </Link>
-            <span>/</span>
-            <span className="text-gray-900 font-medium">{name}</span>
-          </nav>
+          <Breadcrumb 
+            category={category} 
+            currentPage={product.getName()} 
+          />
 
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 p-8">

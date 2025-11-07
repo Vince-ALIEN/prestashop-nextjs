@@ -1,3 +1,4 @@
+import Breadcrumb from "@/components/Breadcrumb";
 import { Product } from "@/lib/prestashop/models";
 import ProductCard from "@/components/ProductCard";
 import Link from "next/link";
@@ -21,6 +22,8 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   return (
     <main className="flex-1 bg-gray-50">
       <div className="container mx-auto px-4 py-8">
+        {/* Fil d'Ariane - Mode simple sans catégorie */}
+        <Breadcrumb currentPage="Produits" />
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Tous nos produits
