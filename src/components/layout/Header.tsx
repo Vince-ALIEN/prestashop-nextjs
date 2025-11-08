@@ -4,10 +4,10 @@ import { ShoppingCart, User, Menu } from "lucide-react";
 export default function Header() {
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto p-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="text-2xl font-bold text-blue-600">
-            PrestaShop
+            PrestaShop<span className="text-2xl font-light text-gray-600">Next</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">

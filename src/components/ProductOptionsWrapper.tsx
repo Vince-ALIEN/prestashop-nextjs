@@ -144,7 +144,7 @@ export default function ProductOptionsWrapper({
                     key={value.id}
                     onClick={() => handleAttributeSelect(group.id, value.id)}
                     className={`
-                      px-4 py-2 rounded-lg border-2 transition-all
+                      px-4 py-2 rounded-lg border-2 transition-all cursor-pointer
                       ${
                         isSelected
                           ? "border-blue-600 bg-blue-50 text-blue-700 font-medium"
@@ -195,7 +195,7 @@ export default function ProductOptionsWrapper({
                 <div className="flex items-center w-full">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-18 h-12 rounded-l-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center font-bold text-gray-700"
+                    className="w-18 h-12 rounded-l-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center font-bold text-gray-700 cursor-pointer"
                   >
                     −
                   </button>
@@ -223,7 +223,7 @@ export default function ProductOptionsWrapper({
                         Math.min(selectedCombination.stock, quantity + 1),
                       )
                     }
-                    className="w-18 h-12 rounded-r-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center font-bold text-gray-700"
+                    className="w-18 h-12 rounded-r-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center font-bold text-gray-700 cursor-pointer"
                   >
                     +
                   </button>
@@ -251,7 +251,7 @@ export default function ProductOptionsWrapper({
               onClick={handleAddToCart}
               disabled={!canAddToCart}
               className={`
-              w-full px-6 py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors
+              w-full px-6 py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer
               ${
                 canAddToCart
                   ? "bg-blue-600 text-white hover:bg-blue-700"
