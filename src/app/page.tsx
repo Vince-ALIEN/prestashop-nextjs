@@ -4,7 +4,7 @@ import Link from "next/link";
 import { MoveRight } from "lucide-react";
 
 export default async function HomePage() {
-  const products = await Product.getActive(8);
+  const products = await Product.getActive(4);
 
   return (
     <main className="flex-1 bg-gray-50">

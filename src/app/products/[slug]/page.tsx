@@ -6,6 +6,7 @@ import ProductOptionsWrapper from "@/components/ProductOptionsWrapper";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft, Package, Weight } from "lucide-react";
+import SanitizedHTML from "@/components/SanitizedHTML";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -15,7 +16,6 @@ export default async function ProductPage(props: PageProps) {
   try {
     const { slug } = await props.params;
     const product = await Product.getBySlug(slug);
-
     if (!product) notFound();
 
     const category = await product.getCategory();
@@ -30,7 +30,6 @@ export default async function ProductPage(props: PageProps) {
 
     let combinations: Combination[] = [];
     let attributeGroups: any[] = [];
-
     if (hasVariants) {
       [combinations, attributeGroups] = await Promise.all([
         product.getCombinations(),
@@ -42,9 +41,9 @@ export default async function ProductPage(props: PageProps) {
       <main className="flex-1 bg-gray-50">
         <div className="container mx-auto px-4 py-8">
           {/* Breadcrumb */}
-          <Breadcrumb 
-            category={category} 
-            currentPage={product.getName()} 
+          <Breadcrumb
+            category={category}
+            currentPage={product.getName()}
           />
 
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -66,7 +65,6 @@ export default async function ProductPage(props: PageProps) {
                     </div>
                   )}
                 </div>
-
                 {images.length > 1 && (
                   <div className="grid grid-cols-6 gap-2">
                     {images.slice(0, 5).map((img) => (
@@ -87,7 +85,7 @@ export default async function ProductPage(props: PageProps) {
               </div>
 
               {/* Product Info */}
-              <div className="lg:col-span-1 col-span-3  space-y-6">
+              <div className="lg:col-span-1 col-span-3 space-y-6">
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 mb-2">
                     {name}
@@ -118,14 +116,12 @@ export default async function ProductPage(props: PageProps) {
                     <span className="text-3xl font-bold text-blue-600">
                       {price}
                     </span>
-
                     {descriptionShort && (
-                      <div
+                      <SanitizedHTML
+                        html={descriptionShort}
                         className="mt-4 text-gray-700 leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: descriptionShort }}
                       />
                     )}
-
                     <div className="mt-4">
                       {isAvailable ? (
                         <button className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
@@ -166,9 +162,9 @@ export default async function ProductPage(props: PageProps) {
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">
                   Description détaillée
                 </h2>
-                <div
+                <SanitizedHTML
+                  html={description}
                   className="prose max-w-none text-gray-700"
-                  dangerouslySetInnerHTML={{ __html: description }}
                 />
               </div>
             )}
@@ -197,7 +193,6 @@ export async function generateMetadata(props: PageProps) {
     const { slug } = await props.params;
     const product = await Product.getBySlug(slug);
     const shopName = await Configuration.getShopName();
-
     return {
       title: `${product.getMetaTitle()} - ${shopName}`,
       description: product.getMetaDescription(),
