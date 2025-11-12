@@ -1,15 +1,17 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "nextps.panel-ufo.fr",
-        port: "",
-        pathname: "/img/**",
+        protocol: 'https',
+        hostname: '**', // Permet tous les domaines HTTPS
+        port: '',
+        pathname: '/api/images/**',
       },
     ],
+    // ✅ Permettre les query strings dans les URLs d'images
+    dangerouslyAllowSVG: true,
+    unoptimized: false,
   },
 };
 

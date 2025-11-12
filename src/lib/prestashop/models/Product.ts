@@ -386,7 +386,7 @@ export default class Product extends Model {
       params.set("limit", limit.toString());
     }
 
-    const uri = `${this.PS_URI}/api/${this.ENDPOINT}?${params}`;
+    const uri = `${process.env.NEXT_PUBLIC_PS_URI}/api/${this.ENDPOINT}?${params}`;
     const res = await fetch(uri, {
       headers: { "Content-Type": "application/json" },
       next: { revalidate: 3600 },
@@ -413,7 +413,7 @@ export default class Product extends Model {
       params.set("limit", limit.toString());
     }
 
-    const uri = `${this.PS_URI}/api/${this.ENDPOINT}?${params}`;
+    const uri = `${process.env.NEXT_PUBLIC_PS_URI}/api/${this.ENDPOINT}?${params}`;
     const res = await fetch(uri, {
       headers: { "Content-Type": "application/json" },
       next: { revalidate: 3600 },
@@ -440,7 +440,7 @@ export default class Product extends Model {
       params.set("limit", limit.toString());
     }
 
-    const uri = `${this.PS_URI}/api/${this.ENDPOINT}?${params}`;
+    const uri = `${process.env.NEXT_PUBLIC_PS_URI}/api/${this.ENDPOINT}?${params}`;
     const res = await fetch(uri, {
       headers: { "Content-Type": "application/json" },
       next: { revalidate: 3600 },

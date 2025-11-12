@@ -1,17 +1,20 @@
+// src/types/index.ts
+
 export interface FormattedAttributeGroup {
   id: number;
   name: string;
   values: Array<{
     id: number;
     name: string;
-    color: string | null;
+    color?: string | null;
   }>;
 }
 
 export interface FormattedCombination {
   id: number;
-  reference: string;
-  price: string;
-  stock: number;
   attributes: number[];
+  price: string;
+  reference?: string; // ✅ Optionnel
+  stock: number;
+  id_image?: number; // ✅ Important pour ProductImage et ProductGallery
 }
