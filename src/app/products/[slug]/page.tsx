@@ -1,11 +1,13 @@
 import { Product, Configuration } from "@/lib/prestashop/models";
 import Combination from "@/lib/prestashop/models/Combination";
+import { FormattedCombination } from "@/types";
 import Breadcrumb from "@/components/Breadcrumb";
 import ProductImage from "@/components/ProductImage";
 import ProductOptionsWrapper from "@/components/ProductOptionsWrapper";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft, Package, Weight } from "lucide-react";
+import SanitizedHTML from "@/components/SanitizedHTML";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -15,36 +17,71 @@ export default async function ProductPage(props: PageProps) {
   try {
     const { slug } = await props.params;
     const product = await Product.getBySlug(slug);
-
     if (!product) notFound();
 
+    // Charger les informations de base du produit
     const category = await product.getCategory();
     const name = product.getName();
     const description = product.getDescription();
     const descriptionShort = product.getDescriptionShort();
-    const price = product.getFormattedPrice();
+    
+    // Utiliser le service de prix pour les informations de prix et réductions
+    const priceService = product.getPriceService();
+    const hasDiscount = await priceService.hasSpecificPrice();
+    
+    // Prix actuel (avec réduction si applicable)
+    const price = await priceService.getFormattedCurrentPrice();
+    
+    // Informations de réduction (uniquement si hasDiscount est true)
+    let originalPrice = '';
+    let discountPercentage = '';
+    let savingsPercentage = '';
+    
+    if (hasDiscount) {
+      originalPrice = priceService.getFormattedBasePrice();
+      discountPercentage = await priceService.getFormattedReductionPercentage();
+      savingsPercentage = await priceService.getFormattedSavingsPercentage();
+    }
+    
     const images = product.getImages();
     const mainImage = product.getMainImage();
     const isAvailable = product.isAvailable();
     const hasVariants = product.hasVariants();
 
-    let combinations: Combination[] = [];
+    let combinations: FormattedCombination[] = [];
     let attributeGroups: any[] = [];
 
     if (hasVariants) {
-      [combinations, attributeGroups] = await Promise.all([
+      // Récupérer les combinaisons brutes et les groupes d'attributs
+      const [combinationsRaw, attributeGroupsData] = await Promise.all([
         product.getCombinations(),
         product.getAttributeGroups(),
       ]);
+      
+      attributeGroups = attributeGroupsData;
+      
+      // Convertir les combinaisons brutes en objets formatés avec réductions
+      const formatPromises = combinationsRaw.map(async (c) => {
+        if (await c.hasSpecificPrice()) {
+          // Si la combinaison a une réduction, utiliser la méthode avancée
+          return await c.toFormattedCombinationWithDiscount(product.getPrice());
+        } else {
+          // Sinon, utiliser la méthode standard
+          return c.toFormattedCombination(product.getPrice());
+        }
+      });
+      
+      // Attendre que toutes les promesses soient résolues
+      combinations = await Promise.all(formatPromises);
     }
 
     return (
       <main className="flex-1 bg-gray-50">
         <div className="container mx-auto px-4 py-8">
           {/* Breadcrumb */}
-          <Breadcrumb 
-            category={category} 
-            currentPage={product.getName()} 
+          <Breadcrumb
+            category={category}
+            currentPage={product.getName()}
           />
 
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -53,20 +90,26 @@ export default async function ProductPage(props: PageProps) {
               <div className="lg:col-span-2 col-span-3 space-y-4">
                 <div className="relative lg:h-200 h-80 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
                   {mainImage ? (
-                    <ProductImage
-                      productId={product.id}
-                      imageId={mainImage.id}
-                      alt={name}
-                      size="large_default"
-                      priority
-                    />
+                    <div className="relative w-full h-full">
+                      <ProductImage
+                        productId={product.id}
+                        imageId={mainImage.id}
+                        alt={name}
+                        size="large_default"
+                        priority
+                      />
+                      {hasDiscount && (
+                        <div className="badge discount absolute top-4 right-4 bg-red-600 text-white rounded-full px-3 py-1 font-bold shadow-md">
+                          {discountPercentage}
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     <div className="flex items-center justify-center h-full">
                       <p className="text-gray-400">Aucune image disponible</p>
                     </div>
                   )}
                 </div>
-
                 {images.length > 1 && (
                   <div className="grid grid-cols-6 gap-2">
                     {images.slice(0, 5).map((img) => (
@@ -87,7 +130,7 @@ export default async function ProductPage(props: PageProps) {
               </div>
 
               {/* Product Info */}
-              <div className="lg:col-span-1 col-span-3  space-y-6">
+              <div className="lg:col-span-1 col-span-3 space-y-6">
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 mb-2">
                     {name}
@@ -104,33 +147,55 @@ export default async function ProductPage(props: PageProps) {
                 {hasVariants ? (
                   <ProductOptionsWrapper
                     groups={attributeGroups}
-                    combinations={combinations.map((c) =>
-                      c.toFormattedCombination(product.getPrice()),
-                    )}
+                    combinations={combinations}
                     basePrice={price}
                     isProductActive={isAvailable}
                     productId={product.id}
                     productName={name}
                     descriptionShort={descriptionShort}
+                    hasDiscount={hasDiscount}
+                    originalPrice={originalPrice}
+                    savingsPercentage={savingsPercentage}
                   />
                 ) : (
                   <div>
-                    <span className="text-3xl font-bold text-blue-600">
-                      {price}
-                    </span>
-
+                    <div className="product__price-container">
+                      {hasDiscount ? (
+                        <div className="product__discount">
+                          <span className="text-3xl font-bold text-blue-600">
+                            {price}
+                          </span>
+                          <span className="product__price-regular text-gray-500 line-through ml-2">
+                            {originalPrice}
+                          </span>
+                          <span className="product__discount-percentage text-red-600 block mt-1 text-sm">
+                            {savingsPercentage}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-3xl font-bold text-blue-600">
+                          {price}
+                        </span>
+                      )}
+                    </div>
+                    
                     {descriptionShort && (
-                      <div
+                      <SanitizedHTML
+                        html={descriptionShort}
                         className="mt-4 text-gray-700 leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: descriptionShort }}
                       />
                     )}
-
                     <div className="mt-4">
                       {isAvailable ? (
-                        <button className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                          Ajouter au panier
-                        </button>
+                        <form action="/api/cart/add" method="POST">
+                          <input type="hidden" name="id_product" value={product.id} />
+                          <input type="hidden" name="quantity" value="1" />
+                          <button 
+                            type="submit"
+                            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                            Ajouter au panier
+                          </button>
+                        </form>
                       ) : (
                         <div className="w-full px-6 py-3 bg-red-100 text-red-700 rounded-lg text-center font-medium">
                           Produit indisponible
@@ -166,9 +231,9 @@ export default async function ProductPage(props: PageProps) {
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">
                   Description détaillée
                 </h2>
-                <div
+                <SanitizedHTML
+                  html={description}
                   className="prose max-w-none text-gray-700"
-                  dangerouslySetInnerHTML={{ __html: description }}
                 />
               </div>
             )}
@@ -196,8 +261,9 @@ export async function generateMetadata(props: PageProps) {
   try {
     const { slug } = await props.params;
     const product = await Product.getBySlug(slug);
+    if (!product) return { title: "Produit" };
+    
     const shopName = await Configuration.getShopName();
-
     return {
       title: `${product.getMetaTitle()} - ${shopName}`,
       description: product.getMetaDescription(),

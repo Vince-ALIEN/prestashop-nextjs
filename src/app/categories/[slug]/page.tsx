@@ -1,10 +1,13 @@
-import { Category } from "@/lib/prestashop/models";
+import { Category, Configuration } from "@/lib/prestashop/models";
+import { getPageTitle, cleanDescription } from "@/lib/prestashop/config-helpers";
+import type { Metadata } from "next";
 import CategoryCard from "@/components/CategoryCard";
 import ProductCard from "@/components/ProductCard";
 import Breadcrumb from "@/components/Breadcrumb";
 import { notFound } from "next/navigation";
 import { Layers, Package, MoveRight } from "lucide-react";
 import Link from "next/link";
+
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -155,18 +158,27 @@ export default async function CategoryPage(props: PageProps) {
   }
 }
 
-export async function generateMetadata(props: PageProps) {
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
   try {
     const { slug } = await props.params;
     const category = await Category.getBySlug(slug);
-
+    
     if (!category) {
       return { title: "Catégorie introuvable" };
     }
-
+    
+    const categoryTitle = category.getMetaTitle() || category.getName();
+    const fullTitle = await getPageTitle(categoryTitle);
+    const descriptionText = cleanDescription(category.getDescription());
+    
     return {
-      title: `${category.getMetaTitle()}`,
-      description: category.getMetaDescription(),
+      title: fullTitle,
+      description: category.getMetaDescription() || descriptionText,
+      openGraph: {
+        title: fullTitle,
+        description: category.getMetaDescription() || descriptionText,
+        type: 'website',
+      },
     };
   } catch (error) {
     return { title: "Catégorie" };

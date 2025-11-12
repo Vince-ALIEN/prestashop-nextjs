@@ -3,6 +3,8 @@ import Combination from "./Combination";
 import Category from "./Category";
 import Manufacturer from "./Manufacturer";
 import Supplier from "./Supplier";
+import SpecificPrice from "./SpecificPrice";
+import { ProductPriceService } from '../services';
 
 type LanguageField = string | Array<{ value: string }>;
 
@@ -150,6 +152,9 @@ export default class Product extends Model {
   private _category?: Category;
   private _manufacturer?: Manufacturer;
   private _supplier?: Supplier;
+  
+  // Service de prix
+  private _priceService?: ProductPriceService;
 
   constructor(data: ProductData) {
     super();
@@ -302,6 +307,17 @@ export default class Product extends Model {
 
     // Associations
     this.associations = data.associations;
+  }
+
+  // ============================================
+  // SERVICE DE PRIX
+  // ============================================
+
+  getPriceService(): ProductPriceService {
+    if (!this._priceService) {
+      this._priceService = new ProductPriceService(this);
+    }
+    return this._priceService;
   }
 
   // ============================================

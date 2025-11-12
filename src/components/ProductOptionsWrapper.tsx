@@ -1,8 +1,10 @@
+// src/components/ProductOptionsWrapper.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { FormattedAttributeGroup, FormattedCombination } from "@/types";
 import { ShoppingCart, Package, AlertCircle } from "lucide-react";
+
 
 interface Props {
   groups: FormattedAttributeGroup[];
@@ -12,7 +14,11 @@ interface Props {
   productId: number;
   productName: string;
   descriptionShort?: string;
+  hasDiscount?: boolean;
+  originalPrice?: string;
+  savingsPercentage?: string;
 }
+
 
 export default function ProductOptionsWrapper({
   groups,
@@ -22,6 +28,9 @@ export default function ProductOptionsWrapper({
   productId,
   productName,
   descriptionShort,
+  hasDiscount = false,
+  originalPrice = "",
+  savingsPercentage = "",
 }: Props) {
   // État pour stocker les attributs sélectionnés
   const [selectedAttributes, setSelectedAttributes] = useState<
@@ -93,11 +102,47 @@ export default function ProductOptionsWrapper({
 
   return (
     <div className="space-y-6">
-      {/* Prix */}
-      <div>
-        <span className="text-3xl font-bold text-blue-600">
-          {selectedCombination ? selectedCombination.price : basePrice}
-        </span>
+      {/* Prix - avec gestion des réductions au niveau produit et combinaison */}
+      <div className="product__price-container">
+        {selectedCombination ? (
+          // Affichage du prix de la combinaison sélectionnée
+          selectedCombination.has_discount ? (
+            <div className="product__discount">
+              <span className="text-3xl font-bold text-blue-600">
+                {selectedCombination.price}
+              </span>
+              <span className="product__price-regular text-gray-500 line-through ml-2">
+                {selectedCombination.formatted_original_price}
+              </span>
+              <span className="product__discount-percentage text-red-600 block mt-1 text-sm">
+                {selectedCombination.formatted_savings_percentage}
+              </span>
+            </div>
+          ) : (
+            <span className="text-3xl font-bold text-blue-600">
+              {selectedCombination.price}
+            </span>
+          )
+        ) : (
+          // Affichage du prix du produit de base
+          hasDiscount ? (
+            <div className="product__discount">
+              <span className="text-3xl font-bold text-blue-600">
+                {basePrice}
+              </span>
+              <span className="product__price-regular text-gray-500 line-through ml-2">
+                {originalPrice}
+              </span>
+              <span className="product__discount-percentage text-red-600 block mt-1 text-sm">
+                {savingsPercentage}
+              </span>
+            </div>
+          ) : (
+            <span className="text-3xl font-bold text-blue-600">
+              {basePrice}
+            </span>
+          )
+        )}
       </div>
 
       {/* Description courte */}

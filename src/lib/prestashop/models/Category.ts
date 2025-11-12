@@ -133,7 +133,8 @@ export default class Category extends Model {
 
   static async getBySlug(slug: string): Promise<Category> {
     return this.findOne(
-      { link_rewrite: slug },
+      //{ link_rewrite: slug },
+      { link_rewrite: String(slug) },
       { exactMatch: true }
     ) as Promise<Category>;
   }

@@ -1,19 +1,32 @@
-import { Category } from "@/lib/prestashop/models";
+import { Category, Configuration } from "@/lib/prestashop/models";
 import CategoryCard from "@/components/CategoryCard";
-import Link from "next/link";
 import { MoveRight, Layers } from "lucide-react";
+import Breadcrumb from "@/components/Breadcrumb";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Catégories  PrestaShop",
-  description: "Découvrez toutes nos catégories de produits",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const shopName = await Configuration.getShopName();
+    // Récupérer les métadonnées de la page catégories depuis PrestaShop si disponible
+    // Sinon utiliser des valeurs par défaut
+    return {
+      title: `Catégories - ${shopName}`,
+      description: "Découvrez toutes nos catégories de produits",
+    };
+  } catch (error) {
+    return {
+      title: "Catégories",
+      description: "Découvrez toutes nos catégories de produits",
+    };
+  }
+}
 
 export default async function CategoriesPage() {
   const rootCategories = await Category.getRootCategories();
 
   return (
     <main className="flex-1 bg-gray-50">
-      {/* Hero Section - Style identique à ta HomePage */}
+      {/* Hero Section - Style corrigé avec gradient */}
       <section className="bg-linear-to-r from-blue-600 to-blue-800 text-white">
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-5xl font-bold mb-6">
@@ -25,7 +38,12 @@ export default async function CategoriesPage() {
         </div>
       </section>
 
-      {/* Categories Section - Structure identique à ta section produits */}
+      {/* Breadcrumb */}
+      <div className="container mx-auto px-4 py-4">
+        <Breadcrumb currentPage="Catégories" />
+      </div>
+
+      {/* Categories Section */}
       <section className="container mx-auto px-4 py-16">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-bold text-gray-900">
