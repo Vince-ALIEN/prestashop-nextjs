@@ -26,7 +26,24 @@ interface ProductData {
 
 interface ProductPageClientProps {
   data: {
-    product: ProductData;
+    product: {
+      id: number;
+      name: string;
+      description: string;
+      descriptionShort: string;
+      reference: string;
+      price: string;
+      isActive: boolean;
+      isNew: boolean;
+      isOnSale: boolean;
+      isOnlineOnly: boolean;
+      manufacturerName: string;
+      weight: number;
+      dimensions: string | null;
+      images: Array<{ id: number; url: string; alt: string }>;
+      mainImage: { id: number; url: string; alt: string; legend?: string } | null;
+      stock: number;
+    };
     groups: FormattedAttributeGroup[];
     combinations: FormattedCombination[];
   };
@@ -44,7 +61,6 @@ export function ProductPageClient({ data }: ProductPageClientProps) {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-7xl mx-auto">
         {/* Fil d'Ariane */}
         <nav className="mb-6 text-sm text-gray-600">
           <a href="/" className="hover:text-blue-600">
@@ -113,6 +129,8 @@ export function ProductPageClient({ data }: ProductPageClientProps) {
               productId={product.id}
               productName={product.name}
               descriptionShort={product.descriptionShort}
+              productStock={product.stock}
+              productReference={product.reference}
             />
 
             {/* Informations complémentaires */}
@@ -141,7 +159,7 @@ export function ProductPageClient({ data }: ProductPageClientProps) {
 
         {/* Description complète */}
         {product.description && (
-          <div className="mt-12 max-w-4xl">
+          <div className="mt-12 max-w-none">
             <h2 className="text-2xl font-bold mb-4">Description</h2>
             <div
               className="prose max-w-none text-gray-700"
@@ -149,7 +167,6 @@ export function ProductPageClient({ data }: ProductPageClientProps) {
             />
           </div>
         )}
-      </div>
     </div>
   );
 }

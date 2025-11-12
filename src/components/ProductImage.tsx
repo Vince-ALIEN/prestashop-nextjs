@@ -2,8 +2,14 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { getPrestaShopImageUrl, type ImageSize } from "@/lib/image-helper";
 import { ImageOff } from "lucide-react";
+
+export type ImageSize =
+  | 'cart_default'
+  | 'small_default'
+  | 'medium_default'
+  | 'large_default'
+  | 'thickbox_default';
 
 interface ProductImageProps {
   productId?: string | number | null;
@@ -35,7 +41,8 @@ export default function ProductImage({
     );
   }
 
-  const imageUrl = getPrestaShopImageUrl(productId, imageId, size);
+  // Utilise la route API Next.js pour plus de sécurité et de cohérence
+  const imageUrl = `/api/images/products/${productId}/${imageId}`;
 
   return (
     <Image

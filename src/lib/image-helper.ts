@@ -1,5 +1,4 @@
 // src/lib/image-helper.ts
-
 export type ImageSize = 
   | 'cart_default'
   | 'small_default'
@@ -28,10 +27,10 @@ export function getPrestaShopImageUrl(
   imageId: string | number,
   size: ImageSize = 'large_default'
 ): string {
-  const baseUrl = process.env.NEXT_PUBLIC_PRESTASHOP_URL;
+  const baseUrl = process.env.PRESTASHOP_URI;
   
   if (!baseUrl) {
-    console.warn('NEXT_PUBLIC_PRESTASHOP_URL is not defined');
+    console.warn('PRESTASHOP_URI is not defined');
     return '/placeholder.jpg';
   }
 
@@ -62,7 +61,7 @@ export function getCategoryImageUrl(
   categoryId: string | number,
   size: ImageSize = 'medium_default'
 ): string {
-  const baseUrl = process.env.NEXT_PUBLIC_PRESTASHOP_URL;
+  const baseUrl = process.env.PRESTASHOP_URI;
   
   if (!baseUrl) {
     return '/placeholder.jpg';
@@ -82,7 +81,7 @@ export function getManufacturerImageUrl(
   size: ImageSize = 'medium_default'
 ): string {
   // Option 1 : URL directe de PrestaShop
-  const baseUrl = process.env.NEXT_PUBLIC_PRESTASHOP_URL;
+  const baseUrl = process.env.PRESTASHOP_URI;
 
   // Option 2 : CDN (ex: Cloudflare, Cloudinary)
   // const baseUrl = process.env.NEXT_PUBLIC_CDN_URL;

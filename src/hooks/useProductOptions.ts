@@ -6,12 +6,14 @@ interface UseProductOptionsParams {
   groups: FormattedAttributeGroup[];
   combinations: FormattedCombination[];
   isProductActive: boolean;
+  productStock?: number; // Stock du produit simple (sans combinaisons)
 }
 
 export function useProductOptions({
   groups,
   combinations,
   isProductActive,
+  productStock = 0,
 }: UseProductOptionsParams) {
   const [selectedAttributes, setSelectedAttributes] = useState<Record<number, number>>({});
   const [quantity, setQuantity] = useState(1);
@@ -33,13 +35,18 @@ export function useProductOptions({
     }) || null;
   }, [selectedAttributes, combinations, groups.length]);
 
+  // Détecte si c'est un produit simple
+  const isSimpleProduct = groups.length === 0;
+
+  // Stock effectif (produit simple ou combinaison)
+  const effectiveStock = isSimpleProduct ? productStock : (selectedCombination?.stock || 0);
+
   // Validations
   const allOptionsSelected = Object.keys(selectedAttributes).length === groups.length;
-  const canAddToCart = 
+  const canAddToCart =
     isProductActive &&
-    allOptionsSelected &&
-    !!selectedCombination &&
-    selectedCombination.stock > 0;
+    (isSimpleProduct || (allOptionsSelected && !!selectedCombination)) &&
+    effectiveStock > 0;
 
   // Handlers
   const selectAttribute = (groupId: number, valueId: number) => {
@@ -50,9 +57,7 @@ export function useProductOptions({
   };
 
   const incrementQuantity = () => {
-    if (selectedCombination) {
-      setQuantity((q) => Math.min(selectedCombination.stock, q + 1));
-    }
+    setQuantity((q) => Math.min(effectiveStock, q + 1));
   };
 
   const decrementQuantity = () => {
@@ -60,9 +65,7 @@ export function useProductOptions({
   };
 
   const setQuantitySafe = (value: number) => {
-    if (selectedCombination) {
-      setQuantity(Math.max(1, Math.min(selectedCombination.stock, value)));
-    }
+    setQuantity(Math.max(1, Math.min(effectiveStock, value)));
   };
 
   // Reset quantity when combination changes

@@ -3,6 +3,7 @@ import Combination from "./Combination";
 import Category from "./Category";
 import Manufacturer from "./Manufacturer";
 import Supplier from "./Supplier";
+import Stock from "./Stock";
 
 type LanguageField = string | Array<{ value: string }>;
 
@@ -367,12 +368,23 @@ export default class Product extends Model {
   // MÉTHODES STATIQUES DE RECHERCHE
   // ============================================
 
-  static async getBySlug(slug: string): Promise<Product> {
-    return this.findOne(
-      { link_rewrite: slug },
-      { exactMatch: true }
-    ) as Promise<Product>;
+  static async getBySlug(slug: string): Promise<Product | null> {
+    if (!slug) return null;
+
+    try {
+      // Utilise findOne avec le filtre link_rewrite
+      const product = await this.findOne(
+        { link_rewrite: slug },
+        { exactMatch: true }
+      );
+      return product;
+    } catch (error) {
+      console.error("Erreur lors de la recherche du produit par slug:", error);
+      return null;
+    }
   }
+
+
 
   static async getActive(limit?: number): Promise<Product[]> {
     const params = new URLSearchParams({
@@ -386,7 +398,8 @@ export default class Product extends Model {
       params.set("limit", limit.toString());
     }
 
-    const uri = `${process.env.NEXT_PUBLIC_PS_URI}/api/${this.ENDPOINT}?${params}`;
+    const uri = `${process.env.PRESTASHOP_URI}/api/${this.ENDPOINT}?${params}`;
+
     const res = await fetch(uri, {
       headers: { "Content-Type": "application/json" },
       next: { revalidate: 3600 },
@@ -413,11 +426,11 @@ export default class Product extends Model {
       params.set("limit", limit.toString());
     }
 
-    const uri = `${process.env.NEXT_PUBLIC_PS_URI}/api/${this.ENDPOINT}?${params}`;
-    const res = await fetch(uri, {
-      headers: { "Content-Type": "application/json" },
-      next: { revalidate: 3600 },
-    });
+    const uri = `/api/prestashop/products?${params}`;
+const res = await fetch(uri, {
+  headers: { "Content-Type": "application/json" },
+  next: { revalidate: 3600 },
+});
 
     const json = await res.json();
     const data = Array.isArray(json) ? json : json[this.ENDPOINT!] || [];
@@ -440,11 +453,11 @@ export default class Product extends Model {
       params.set("limit", limit.toString());
     }
 
-    const uri = `${process.env.NEXT_PUBLIC_PS_URI}/api/${this.ENDPOINT}?${params}`;
-    const res = await fetch(uri, {
-      headers: { "Content-Type": "application/json" },
-      next: { revalidate: 3600 },
-    });
+    const uri = `/api/prestashop/products?${params}`;
+const res = await fetch(uri, {
+  headers: { "Content-Type": "application/json" },
+  next: { revalidate: 3600 },
+});
 
     const json = await res.json();
     const data = Array.isArray(json) ? json : json[this.ENDPOINT!] || [];
@@ -515,6 +528,20 @@ export default class Product extends Model {
 
   getQuantity(): number {
     return this.quantity || 0;
+  }
+
+  /**
+   * Récupère le stock réel depuis l'API stock_availables
+   * Pour les produits simples (sans combinaisons)
+   */
+  async getStockQuantity(): Promise<number> {
+    try {
+      const stock = await Stock.getByProduct(this.id, 0);
+      return stock?.getQuantity() || 0;
+    } catch (error) {
+      console.error("Erreur lors de la récupération du stock:", error);
+      return 0;
+    }
   }
 
   isLowStock(): boolean {

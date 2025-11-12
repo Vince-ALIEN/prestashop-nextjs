@@ -8,6 +8,7 @@ interface CombinationData {
   price?: string | number;
   associations?: {
     product_option_values?: Array<{ id: string | number }>;
+    images?: Array<{ id: string | number }>;
   };
 }
 
@@ -69,6 +70,14 @@ export default class Combination extends Model {
     );
   }
 
+  getImageId(): number | null {
+    // Récupérer l'ID de la première image associée à cette combinaison
+    if (!this.associations?.images || this.associations.images.length === 0) {
+      return null;
+    }
+    return parseInt(this.associations.images[0].id.toString());
+  }
+
   toFormattedCombination(basePrice?: number) {
     return {
       id: this.id,
@@ -76,6 +85,7 @@ export default class Combination extends Model {
       price: this.getFormattedPrice(basePrice),
       stock: this.getStock(),
       attributes: this.getAttributeIds(),
+      id_image: this.getImageId(),
     };
   }
 }

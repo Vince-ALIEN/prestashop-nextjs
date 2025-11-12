@@ -1,47 +1,53 @@
-// app/api/products/[id]/[imageId]/route.ts
+// app/api/images/products/[id]/[imageId]/route.ts
 import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string; imageId: string }> }
 ) {
-  const { id, imageId } = await params; // ✅ Récupère les paramètres de l'URL
+  const { id, imageId } = await params;
   const psUri = process.env.PRESTASHOP_URI;
   const apiKey = process.env.PRESTASHOP_API_KEY;
 
   if (!psUri || !apiKey) {
+    console.error("Configuration PrestaShop manquante");
     return NextResponse.json(
       { error: "Configuration manquante" },
       { status: 500 }
     );
   }
 
-  // ✅ Construis l'URL pour récupérer une image spécifique
+  // Construire l'URL PrestaShop pour récupérer l'image
   const prestashopUrl = `${psUri}/api/images/products/${id}/${imageId}?ws_key=${apiKey}`;
-  console.log("URL PrestaShop :", prestashopUrl); // Pour débogage
+  console.log("Requête image PrestaShop:", prestashopUrl);
 
   try {
-    const response = await fetch(prestashopUrl);
+    const response = await fetch(prestashopUrl, {
+      next: { revalidate: 3600 }, // Cache 1 heure
+    });
+
     if (!response.ok) {
+      console.error(`Image non trouvée: ${prestashopUrl} (${response.status})`);
       return NextResponse.json(
         { error: "Image non trouvée" },
         { status: 404 }
       );
     }
 
-    // ✅ Récupère l'image en tant que buffer
+    // Récupérer l'image en tant que buffer
     const imageBuffer = await response.arrayBuffer();
+    const contentType = response.headers.get("Content-Type") || "image/jpeg";
 
-    // ✅ Retourne l'image avec les bons headers
+    // Retourner l'image avec les bons headers
     return new NextResponse(imageBuffer, {
       status: 200,
       headers: {
-        "Content-Type": response.headers.get("Content-Type") || "image/jpeg",
-        "Cache-Control": "public, max-age=31536000, immutable", // Cache agressif
+        "Content-Type": contentType,
+        "Cache-Control": "public, max-age=31536000, immutable",
       },
     });
   } catch (error) {
-    console.error("Erreur serveur :", error);
+    console.error("Erreur lors du chargement de l'image:", error);
     return NextResponse.json(
       { error: "Erreur serveur" },
       { status: 500 }

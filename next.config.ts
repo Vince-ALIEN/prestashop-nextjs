@@ -4,15 +4,13 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**', // Permet tous les domaines HTTPS
-        port: '',
-        pathname: '/api/images/**',
+        hostname: 'nextps.panel-ufo.fr',
+        pathname: '/**',
       },
     ],
-    // ✅ Permettre les query strings dans les URLs d'images
     dangerouslyAllowSVG: true,
-    unoptimized: false,
+    unoptimized: false, // Garde cette option si tu veux optimiser les images
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

@@ -4,3 +4,4 @@ export { default as Category } from "./Category";
 export { default as Configuration } from "./Configuration";
 export { default as Combination } from "./Combination";
 export { default as Image } from "./Image";
+export { default as Stock } from "./Stock";

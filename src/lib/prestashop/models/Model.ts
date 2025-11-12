@@ -94,7 +94,7 @@ export default class Model extends Prestashop {
       limit: "1",
     });
 
-    if (filter) {
+    if (filter && Object.keys(filter).length > 0) {
       for (const key in filter) {
         if (options.exactMatch) {
           params.set(`filter[${key}]`, `[${filter[key]}]`);
@@ -123,9 +123,7 @@ export default class Model extends Prestashop {
     const data = Array.isArray(json) ? json : json[this.ENDPOINT!];
 
     if (!Array.isArray(data) || data.length === 0) {
-      throw new Error(
-        `No ${this.ENDPOINT} found with filter: ${JSON.stringify(filter)}`
-      );
+      return null;
     }
 
     return new (this as any)(data[0]);

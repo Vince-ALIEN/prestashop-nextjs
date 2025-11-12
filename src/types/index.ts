@@ -14,7 +14,7 @@ export interface FormattedCombination {
   id: number;
   attributes: number[];
   price: string;
-  reference?: string; // ✅ Optionnel
+  reference?: string;
   stock: number;
-  id_image?: number; // ✅ Important pour ProductImage et ProductGallery
+  id_image?: number | null; // Peut être number, null ou undefined
 }
